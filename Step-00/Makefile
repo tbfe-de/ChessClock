@@ -1,7 +1,7 @@
 EXE= chess-clock
 
 run: $(EXE)
-	@./$(EXE)
+	@./$(EXE) $m $s
 
 $(EXE): main.cpp
 	g++ -std=c++17 *.cpp -o $@
