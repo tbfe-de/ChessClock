@@ -1,21 +1,60 @@
 #include <cctype>
+#include <cstdint>
 #include <functional>
+#include <iomanip>
 #include <iostream>
+
+using counter_t = std::uint_least32_t;
+
+enum player : std::size_t { NONE, WHITE, BLACK };
+
+counter_t clocks[3] = { 15*60, 0, 0 };
+
+char const clockwork_symbols[] = { '|',  '/', '-', '\\' };
+char const *clockwork_indicator = &clockwork_symbols[0];
+
+void show_clocks(unsigned which) {
+    auto show_single = [](std::string const& txt, counter_t const clk) {
+        std::ostream os{std::cout.rdbuf()};
+        os.fill('0');
+        os << *clockwork_indicator << ' ' << txt
+           << std::setw(2) << clk/60 << ':'
+           << std::setw(2) << clk%60 << std::endl;
+    };
+    std::cout << "* ------------------------------\n";
+    if (which & (1<<NONE)) show_single("TOTAL ", clocks[NONE]);
+    if (which & (1<<WHITE)) show_single("WHITE ", clocks[WHITE]);
+    if (which & (1<<BLACK)) show_single("BLACK ", clocks[BLACK]);
+}
+
+void set_clocks() {
+    clocks[WHITE] = clocks[NONE];
+    clocks[BLACK] = clocks[NONE];
+}
 
 using menu_prompt = std::string;
 using menu_action = std::function<bool(std::string const &)>;
 
-auto set_clocks(std::string const&) {
-    // TBD
+auto reset(std::string const&) {
+    set_clocks();
+    show_clocks((1<<WHITE)|(1<<BLACK));
     return true;
 }
-auto start_game(std::string const&) {
-    // TBD
+
+player active = NONE;
+
+auto start(std::string const&) {
+    active = WHITE;
+    show_clocks(1<<active);
     return true;
 }
 
 auto toggle_player() {
-    // TBD
+    switch (active) {
+        case WHITE: active = BLACK; break;
+        case BLACK: active = WHITE; break;
+    }
+    show_clocks(1<<active);
 }
 
 struct menu_ctl {
@@ -28,6 +67,7 @@ bool menu(std::initializer_list<menu_ctl> ctl) {
     auto show_prompts = [&](){
         for (auto const e : ctl)
             cout << e.prompt << '\n';
+        show_clocks(1<<NONE);
     };
     string cmd;
     auto find_action = [&](char ch) -> menu_action {
@@ -38,9 +78,12 @@ bool menu(std::initializer_list<menu_ctl> ctl) {
         return {};
     };
 
+    show_prompts();
     while (cout << "? ", getline(cin, cmd)) {
-        if (cmd.empty())
-            toggle_player();
+        if (cmd.empty()) {
+            if (active != NONE)
+                toggle_player();
+        }
         else if (auto action = find_action(toupper(cmd.at(0)))) {
             if (not action(cmd)) break;
         }
@@ -49,17 +92,17 @@ bool menu(std::initializer_list<menu_ctl> ctl) {
     return false;
 }
 
-auto end_program(std::string const&) {
+auto quit(std::string const&) {
     return false;
 }
 
 int main() {
     using namespace std::string_literals;
-    std::cout << "* Welcome to the Chess-Clock" << std::endl;
+    std::cout << "* Welcome from the Chess-Clock *" << std::endl;
     do {} while (menu({
-        { "R = (re-)set to start value"s, set_clocks },
-        { "S = start a game (first white)"s, start_game },
-        { "Q = end program"s, end_program },
+        { "R = (re-)set to start value"s, reset },
+        { "S = start a game (first white)"s, start },
+        { "Q = end program"s, quit },
     }));
-    std::cout << "* Goodbye says the Chess-Clock" << std::endl;
+    std::cout << "* The Chess-Clock says Goodbye *" << std::endl;
 }
