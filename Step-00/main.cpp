@@ -2,6 +2,8 @@
 #include <cctype>
 #include <chrono>
 #include <cstdint>
+#include <cstdlib>
+#include <fstream>
 #include <functional>
 #include <iomanip>
 #include <iostream>
@@ -10,8 +12,10 @@
 #include <string>
 #include <thread>
 
-enum player : std::size_t { NONE, WHITE, BLACK };
+std::ofstream aux_tty; // <-------- should go before ...
+std::ostream aux_out{std::cout.rdbuf()}; // ... this one
 
+enum player : std::size_t { NONE, WHITE, BLACK };
 std::atomic<player> active = NONE;
 
 using counter_t = std::uint_least32_t;
@@ -45,13 +49,13 @@ decltype(auto) show_single_clock(std::ostream &strm, player idx) {
 }
 
 void show_clocks(unsigned which) {
-    std::cerr << "+ ------------------------------\n";
+    aux_out << "+ ------------------------------\n";
     if (which & (1<<NONE))
-        show_single_clock(std::cerr, NONE) << " preset" << std::endl;
+        show_single_clock(aux_out, NONE) << " preset" << std::endl;
     if (which & (1<<WHITE))
-        show_single_clock(std::cerr, WHITE) << " initial" << std::endl;
+        show_single_clock(aux_out, WHITE) << " initial" << std::endl;
     if (which & (1<<BLACK))
-        show_single_clock(std::cerr, BLACK) << " initial" << std::endl;
+        show_single_clock(aux_out, BLACK) << " initial" << std::endl;
 }
 
 void set_clocks() {
@@ -102,7 +106,7 @@ void ticker_thread() {
         phase = (phase + 1) % N_CLOCKWORK_SYMBOLS;
         clockwork_indicator = &clockwork_symbols[phase];
         if (phase == 0) --player_clock[active].count;
-        show_single_clock(std::cerr, active);
+        show_single_clock(aux_out, active);
         using namespace std::chrono_literals;
         static_assert(1000 % N_CLOCKWORK_SYMBOLS == 0,
                       "otherwise clock skew will accumulate");
@@ -111,17 +115,17 @@ void ticker_thread() {
     }
     switch (active) {
         case WHITE:
-            std::cerr << "\r| WHITE time expired\n";
-            show_single_clock(std::cerr, BLACK);
+            aux_out << "\r| WHITE time expired\n";
+            show_single_clock(aux_out, BLACK);
             break;
         case BLACK:
-            std::cerr << "\r| BLACK time expired\n";
-            show_single_clock(std::cerr, WHITE);
+            aux_out << "\r| BLACK time expired\n";
+            show_single_clock(aux_out, WHITE);
             break;
         default:
             break;
     }
-    std::cerr << " (wins)" << std::endl;
+    aux_out << " (wins)" << std::endl;
     std::cout << "hit <Return> to continue" << std::flush;
     active = NONE;
 }
@@ -138,6 +142,7 @@ auto start(std::string const&) {
 }
 
 auto toggle_player() {
+    if (aux_tty) aux_out.put('\n');
     switch (active) {
         case WHITE: active = BLACK; break;
         case BLACK: active = WHITE; break;
@@ -147,12 +152,12 @@ auto toggle_player() {
 using menu_prompt = std::string;
 using menu_action = std::function<bool(std::string const &)>;
 
-struct menu_ctl {
+struct menu_control {
     menu_prompt prompt;
     menu_action action;
 };
 
-bool menu(std::initializer_list<menu_ctl> ctl) {
+bool menu(std::initializer_list<menu_control> ctl) {
     using namespace std;
     auto show_prompts = [&](){
         for (auto const e : ctl)
@@ -193,6 +198,13 @@ auto quit(std::string const&) {
 }
 
 int main(int argc, char *argv[]) {
+    if (auto aux_name = std::getenv("CHESSCLOCK_AUX_TTY")) {
+        aux_tty.open(aux_name);
+        if (aux_tty) {
+            aux_out.rdbuf(aux_tty.rdbuf());
+        }
+    }
+    if (aux_tty) aux_out.put('\n');
     if (argc > 1) parse_mins_secs(argv[1]);
     std::cout << "* Welcome from the Chess-Clock *" << std::endl;
     do {} while (menu({
