@@ -10,14 +10,19 @@
 #include <string>
 #include <thread>
 
-using counter_t = std::uint_least32_t;
-
 enum player : std::size_t { NONE, WHITE, BLACK };
 
 std::atomic<player> active = NONE;
 
-counter_t clocks[3] = { 15*60 };
-char const* const clock_names[3] = { "TOTAL", "WHITE", "BLACK" };
+using counter_t = std::uint_least32_t;
+struct player_clock {
+    char const* const name;
+    std::uint_least16_t count;
+} player_clock[] = {
+    {"RESET", 15*60},
+    {"WHITE", 0},
+    {"BLACK", 0}
+};
 
 char const clockwork_symbols[] = {
         '|',  '/', '-', '\\',
@@ -27,14 +32,14 @@ static_assert(N_CLOCKWORK_SYMBOLS == 8);
 char const *clockwork_indicator = &clockwork_symbols[0];
 
 decltype(auto) show_single_clock(std::ostream &strm, player idx) {
-    auto const clk = clocks[idx];
-    auto const txt = clock_names[idx];
+    auto const val = player_clock[idx].count;
+    auto const txt = player_clock[idx].name;
     std::ostream os{strm.rdbuf()};
     os.fill('0');
     os << '\r' << *clockwork_indicator
         << ' ' << txt
-        << ' ' << std::setw(2) << clk/60
-        << ':' << std::setw(2) << clk%60;
+        << ' ' << std::setw(2) << val/60
+        << ':' << std::setw(2) << val%60;
     os.flush();
     return strm;
 }
@@ -50,21 +55,20 @@ void show_clocks(unsigned which) {
 }
 
 void set_clocks() {
-    clocks[WHITE] = clocks[NONE];
-    clocks[BLACK] = clocks[NONE];
+    player_clock[WHITE].count = player_clock[NONE].count;
+    player_clock[BLACK].count = player_clock[NONE].count;
 }
-
-using menu_prompt = std::string;
-using menu_action = std::function<bool(std::string const &)>;
 
 auto parse_mins_secs(std::string const& str) {
     std::istringstream is{str};
-    unsigned int minutes = clocks[NONE] / 60;
-    unsigned int seconds = clocks[NONE] % 60;
+    auto minutes = player_clock[NONE].count / 60;
+    auto seconds = player_clock[NONE].count % 60;
     std::string s;
     int v;
     if (std::getline(is, s, ':')) {
-        if (!s.empty()) {
+        if (s.empty())
+            minutes = 0;
+        else {
             std::istringstream is2{s};
             if (is2 >> v) minutes = v;
             else minutes = 0;
@@ -78,7 +82,7 @@ auto parse_mins_secs(std::string const& str) {
             }
         }
     }
-    clocks[NONE] = 60*minutes + seconds;
+    player_clock[NONE].count = 60*minutes + seconds;
 }
 
 auto reset(std::string const& str) {
@@ -93,14 +97,15 @@ std::future<void> clockwork;
 void ticker_thread() {
     auto step = std::chrono::steady_clock::now();
     int phase = 0;
-    while (clocks[WHITE] && clocks[BLACK]) {
+    while ((player_clock[WHITE].count > 0)
+        && (player_clock[BLACK].count > 0)) {
         phase = (phase + 1) % N_CLOCKWORK_SYMBOLS;
         clockwork_indicator = &clockwork_symbols[phase];
-        if (phase == 0) --clocks[active];
+        if (phase == 0) --player_clock[active].count;
         show_single_clock(std::cerr, active);
         using namespace std::chrono_literals;
         static_assert(1000 % N_CLOCKWORK_SYMBOLS == 0,
-                        "otherwise clock skew will accumulate");
+                      "otherwise clock skew will accumulate");
         step += 1000ms / N_CLOCKWORK_SYMBOLS;
         std::this_thread::sleep_until(step);
     }
@@ -122,7 +127,8 @@ void ticker_thread() {
 }
 
 auto start(std::string const&) {
-    if ((clocks[WHITE] == 0) || (clocks[BLACK] == 0)) {
+    if ((player_clock[WHITE].count == 0)
+     || (player_clock[BLACK].count == 0)) {
         std::cout << "! not yet (re-) set to start time\n";
         return true;
     }
@@ -137,6 +143,9 @@ auto toggle_player() {
         case BLACK: active = WHITE; break;
     }
 }
+
+using menu_prompt = std::string;
+using menu_action = std::function<bool(std::string const &)>;
 
 struct menu_ctl {
     menu_prompt prompt;
