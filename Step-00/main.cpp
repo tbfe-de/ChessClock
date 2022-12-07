@@ -16,6 +16,7 @@ enum player : std::size_t { NONE, WHITE, BLACK };
 std::atomic<player> active = NONE;
 
 counter_t clocks[3] = { 15*60 };
+char const* const clock_names[3] = { "TOTAL", "WHITE", "BLACK" };
 
 char const clockwork_symbols[] = {
         '|',  '/', '-', '\\',
@@ -24,21 +25,27 @@ auto const N_CLOCKWORK_SYMBOLS = sizeof(clockwork_symbols);
 static_assert(N_CLOCKWORK_SYMBOLS == 8);
 char const *clockwork_indicator = &clockwork_symbols[0];
 
-void show_clocks(unsigned which, bool eol = true) {
-    auto show_single = [eol](std::string const& txt, counter_t const clk) {
-        std::ostream os{std::cout.rdbuf()};
-        os.fill('0');
-        if (!eol) os << '\r';
-        os << *clockwork_indicator << ' ' << txt
-           << std::setw(2) << clk/60 << ':'
-           << std::setw(2) << clk%60;
-        if (eol) os << '\n';
-        os.flush();
-    };
-    if (eol) std::cout << "* ------------------------------\n";
-    if (which & (1<<NONE)) show_single("TOTAL ", clocks[NONE]);
-    if (which & (1<<WHITE)) show_single("WHITE ", clocks[WHITE]);
-    if (which & (1<<BLACK)) show_single("BLACK ", clocks[BLACK]);
+decltype(auto) show_single_clock(std::ostream &strm, player idx) {
+    auto const clk = clocks[idx];
+    auto const txt = clock_names[idx];
+    std::ostream os{strm.rdbuf()};
+    os.fill('0');
+    os << '\r' << *clockwork_indicator
+        << ' ' << txt
+        << ' ' << std::setw(2) << clk/60
+        << ':' << std::setw(2) << clk%60;
+    os.flush();
+    return strm;
+}
+
+void show_clocks(unsigned which) {
+    std::cerr << "+ ------------------------------\n";
+    if (which & (1<<NONE))
+        show_single_clock(std::cerr, NONE) << " preset" << std::endl;
+    if (which & (1<<WHITE))
+        show_single_clock(std::cerr, WHITE) << " initial" << std::endl;
+    if (which & (1<<BLACK))
+        show_single_clock(std::cerr, BLACK) << " initial" << std::endl;
 }
 
 void set_clocks() {
@@ -70,7 +77,7 @@ auto start(std::string const&) {
             phase = (phase + 1) % N_CLOCKWORK_SYMBOLS;
             clockwork_indicator = &clockwork_symbols[phase];
             if (phase == 0) --clocks[active];
-            show_clocks(1<<active, false);
+            show_single_clock(std::cerr, active);
             using namespace std::chrono_literals;
             static_assert(1000 % N_CLOCKWORK_SYMBOLS == 0,
                           "otherwise clock skew will occur");
@@ -79,15 +86,18 @@ auto start(std::string const&) {
         }
         switch (active) {
             case WHITE:
-                std::cout << "\n* BLACK won by WHITE time expired\n";
+                std::cerr << "\r| WHITE time expired\n";
+                show_single_clock(std::cerr, BLACK);
                 break;
             case BLACK:
-                std::cout << "\n* WHITE won by BLACK time expired\n";
+                std::cerr << "\r| BLACK time expired\n";
+                show_single_clock(std::cerr, WHITE);
                 break;
             default:
                 break;
         }
-        std::cout << "* Please hit <Return> to continue" << std::flush;
+        std::cerr << " (wins)" << std::endl;
+        std::cout << "hit <Return> to continue" << std::flush;
         active = NONE;
     });
     return true;
