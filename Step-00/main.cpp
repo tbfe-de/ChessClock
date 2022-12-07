@@ -6,6 +6,7 @@
 #include <iomanip>
 #include <iostream>
 #include <future>
+#include <sstream>
 #include <string>
 #include <thread>
 
@@ -56,7 +57,32 @@ void set_clocks() {
 using menu_prompt = std::string;
 using menu_action = std::function<bool(std::string const &)>;
 
-auto reset(std::string const&) {
+auto parse_mins_secs(std::string const& str) {
+    std::istringstream is{str};
+    unsigned int minutes = clocks[NONE] / 60;
+    unsigned int seconds = clocks[NONE] % 60;
+    std::string s;
+    int v;
+    if (std::getline(is, s, ':')) {
+        if (!s.empty()) {
+            std::istringstream is2{s};
+            if (is2 >> v) minutes = v;
+            else minutes = 0;
+            seconds = 0;
+        }
+        if (std::getline(is, s)) {
+            if (!s.empty()) {
+                std::istringstream is2{s};
+                if (is2 >> v) seconds = v;
+                else seconds = 0;
+            }
+        }
+    }
+    clocks[NONE] = 60*minutes + seconds;
+}
+
+auto reset(std::string const& str) {
+    parse_mins_secs(str);
     set_clocks();
     show_clocks((1<<WHITE)|(1<<BLACK));
     return true;
@@ -64,42 +90,44 @@ auto reset(std::string const&) {
 
 std::future<void> clockwork;
 
+void ticker_thread() {
+    auto step = std::chrono::steady_clock::now();
+    int phase = 0;
+    while (clocks[WHITE] && clocks[BLACK]) {
+        phase = (phase + 1) % N_CLOCKWORK_SYMBOLS;
+        clockwork_indicator = &clockwork_symbols[phase];
+        if (phase == 0) --clocks[active];
+        show_single_clock(std::cerr, active);
+        using namespace std::chrono_literals;
+        static_assert(1000 % N_CLOCKWORK_SYMBOLS == 0,
+                        "otherwise clock skew will accumulate");
+        step += 1000ms / N_CLOCKWORK_SYMBOLS;
+        std::this_thread::sleep_until(step);
+    }
+    switch (active) {
+        case WHITE:
+            std::cerr << "\r| WHITE time expired\n";
+            show_single_clock(std::cerr, BLACK);
+            break;
+        case BLACK:
+            std::cerr << "\r| BLACK time expired\n";
+            show_single_clock(std::cerr, WHITE);
+            break;
+        default:
+            break;
+    }
+    std::cerr << " (wins)" << std::endl;
+    std::cout << "hit <Return> to continue" << std::flush;
+    active = NONE;
+}
+
 auto start(std::string const&) {
     if ((clocks[WHITE] == 0) || (clocks[BLACK] == 0)) {
         std::cout << "! not yet (re-) set to start time\n";
         return true;
     }
     else active = WHITE;
-    clockwork = std::async([]{
-        auto step = std::chrono::steady_clock::now();
-        int phase = 0;
-        while (clocks[WHITE] && clocks[BLACK]) {
-            phase = (phase + 1) % N_CLOCKWORK_SYMBOLS;
-            clockwork_indicator = &clockwork_symbols[phase];
-            if (phase == 0) --clocks[active];
-            show_single_clock(std::cerr, active);
-            using namespace std::chrono_literals;
-            static_assert(1000 % N_CLOCKWORK_SYMBOLS == 0,
-                          "otherwise clock skew will occur");
-            step += 1000ms / N_CLOCKWORK_SYMBOLS;
-            std::this_thread::sleep_until(step);
-        }
-        switch (active) {
-            case WHITE:
-                std::cerr << "\r| WHITE time expired\n";
-                show_single_clock(std::cerr, BLACK);
-                break;
-            case BLACK:
-                std::cerr << "\r| BLACK time expired\n";
-                show_single_clock(std::cerr, WHITE);
-                break;
-            default:
-                break;
-        }
-        std::cerr << " (wins)" << std::endl;
-        std::cout << "hit <Return> to continue" << std::flush;
-        active = NONE;
-    });
+    clockwork = std::async(ticker_thread);
     return true;
 }
 
@@ -132,7 +160,7 @@ bool menu(std::initializer_list<menu_ctl> ctl) {
     };
 
     show_prompts();
-    while (cout << "? ", getline(cin, cmd)) {
+    while (cout << ": ", getline(cin, cmd)) {
         if (cmd.empty()) {
             if (active != NONE)
                 toggle_player();
@@ -143,7 +171,7 @@ bool menu(std::initializer_list<menu_ctl> ctl) {
             }
             auto const cmd_char = std::toupper(cmd.at(0));
             if (auto action = find_action(cmd_char)) {
-                if (not action(cmd)) break;
+                if (not action(cmd.substr(1))) break;
             }
             else std::cout << "! no such command\n";
         }
@@ -156,21 +184,13 @@ auto quit(std::string const&) {
 }
 
 int main(int argc, char *argv[]) {
-    auto t_mins = 0, t_secs = 0;
-    switch (argc) {
-        case 3:
-            t_mins = std::atoi(argv[argc-2]);
-            /*fallthrough*/
-        case 2:
-            t_secs = std::atoi(argv[argc-1]);
-            clocks[NONE] = 60*t_mins + t_secs;
-    }
-    using namespace std::string_literals;
+    if (argc > 1) parse_mins_secs(argv[1]);
     std::cout << "* Welcome from the Chess-Clock *" << std::endl;
     do {} while (menu({
-        { "R = (re-)set to start value"s, reset },
-        { "S = start a game (first white)"s, start },
-        { "Q = end program"s, quit },
+        { "R = (re-)set to <mins>:<secs>\n"
+          "    or last start value used", reset },
+        { "S = start a game (first white)", start },
+        { "Q = end program", quit },
     }));
     std::cout << "* The Chess-Clock says Goodbye *" << std::endl;
 }
