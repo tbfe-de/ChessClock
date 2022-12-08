@@ -23,21 +23,22 @@ enum player : std::size_t {
 std::atomic<player> active = NONE;
 
 using counter_t = std::uint_least32_t;
-struct player_clock {
+struct player_clock_t {
     char const* const name;
     std::uint_least16_t count;
-} player_clock[] = {
+} pclk[] = {
     {"START", 15*60},
     {"WHITE", 0},
     {"BLACK", 0}
 };
-static_assert((sizeof player_clock / sizeof player_clock[0]) == 3,
+static_assert((sizeof pclk / sizeof pclk[0]) == 3,
               "maybe incompatible change to `enum player` above)");
 
-decltype(auto) show_single_clock(std::ostream &strm, player idx) {
+decltype(auto) show_single_clock(std::ostream &strm,
+                                 player_clock_t const& clk) {
     extern char const* ticker_indicator;
-    auto const val = player_clock[idx].count;
-    auto const txt = player_clock[idx].name;
+    auto const val = clk.count;
+    auto const txt = clk.name;
     std::ostream os{strm.rdbuf()};
     os.fill('0');
     os << '\r' << *ticker_indicator
@@ -48,64 +49,28 @@ decltype(auto) show_single_clock(std::ostream &strm, player idx) {
     return strm;
 }
 
-char const ticker_symbols[] = {
-        '|',  '/', '-', '\\',
-        '|',  '/', '-', '\\', };
-auto const N_TICKER_SYMBOLS = sizeof(ticker_symbols);
-static_assert(N_TICKER_SYMBOLS == 8);
-char const *ticker_indicator = &ticker_symbols[0];
-
-void ticker_thread() {
-    auto step = std::chrono::steady_clock::now();
-    int phase = 0;
-    while ((player_clock[WHITE].count > 0)
-        && (player_clock[BLACK].count > 0)) {
-        phase = (phase + 1) % N_TICKER_SYMBOLS;
-        ticker_indicator = &ticker_symbols[phase];
-        if (phase == 0) --player_clock[active].count;
-        show_single_clock(aux_out, active);
-        using namespace std::chrono_literals;
-        static_assert(1000 % N_TICKER_SYMBOLS == 0,
-                      "otherwise clock skew will accumulate");
-        step += 1000ms / N_TICKER_SYMBOLS;
-        std::this_thread::sleep_until(step);
-    }
-    switch (active) {
-        case WHITE:
-            aux_out << "\r| WHITE time expired\n";
-            show_single_clock(aux_out, BLACK);
-            break;
-        case BLACK:
-            aux_out << "\r| BLACK time expired\n";
-            show_single_clock(aux_out, WHITE);
-            break;
-        default:
-            break;
-    }
-    aux_out << " (wins)" << std::endl;
-    std::cout << "hit <Return> to continue" << std::flush;
-    active = NONE;
-}
-
 void show_clocks(unsigned which) {
     aux_out << "+ ------------------------------\n";
     if (which & (1<<NONE))
-        show_single_clock(aux_out, NONE) << " preset" << std::endl;
+        show_single_clock(aux_out, pclk[NONE])
+                            << " preset" << std::endl;
     if (which & (1<<WHITE))
-        show_single_clock(aux_out, WHITE) << " initial" << std::endl;
+        show_single_clock(aux_out, pclk[WHITE])
+                            << " initial" << std::endl;
     if (which & (1<<BLACK))
-        show_single_clock(aux_out, BLACK) << " initial" << std::endl;
+        show_single_clock(aux_out, pclk[BLACK])
+                            << " initial" << std::endl;
 }
 
 void set_clocks() {
-    player_clock[WHITE].count = player_clock[NONE].count;
-    player_clock[BLACK].count = player_clock[NONE].count;
+    pclk[WHITE].count = pclk[NONE].count;
+    pclk[BLACK].count = pclk[NONE].count;
 }
 
 auto parse_mins_secs(std::string const& str) {
     std::istringstream is{str};
-    auto minutes = player_clock[NONE].count / 60;
-    auto seconds = player_clock[NONE].count % 60;
+    auto minutes = pclk[NONE].count / 60;
+    auto seconds = pclk[NONE].count % 60;
     std::string s;
     int v;
     if (std::getline(is, s, ':')) {
@@ -125,7 +90,7 @@ auto parse_mins_secs(std::string const& str) {
             }
         }
     }
-    player_clock[NONE].count = 60*minutes + seconds;
+    pclk[NONE].count = 60*minutes + seconds;
 }
 
 auto reset(std::string const& str) {
@@ -137,11 +102,50 @@ auto reset(std::string const& str) {
     return true;
 }
 
+char const ticker_symbols[] = {
+        '|',  '/', '-', '\\',
+        '|',  '/', '-', '\\', };
+auto const N_TICKER_SYMBOLS = sizeof(ticker_symbols);
+static_assert(N_TICKER_SYMBOLS == 8);
+char const *ticker_indicator = &ticker_symbols[0];
+
+auto ticker_thread() {
+    auto step = std::chrono::steady_clock::now();
+    int phase = 0;
+    while ((pclk[WHITE].count > 0)
+        && (pclk[BLACK].count > 0)) {
+        phase = (phase + 1) % N_TICKER_SYMBOLS;
+        ticker_indicator = &ticker_symbols[phase];
+        if (phase == 0) --pclk[active].count;
+        show_single_clock(aux_out, pclk[active]);
+        using namespace std::chrono_literals;
+        static_assert(1000 % N_TICKER_SYMBOLS == 0,
+                      "otherwise clock skew will accumulate");
+        step += 1000ms / N_TICKER_SYMBOLS;
+        std::this_thread::sleep_until(step);
+    }
+    switch (active) {
+        case WHITE:
+            aux_out << "\r| WHITE time expired\n";
+            show_single_clock(aux_out, pclk[BLACK]);
+            break;
+        case BLACK:
+            aux_out << "\r| BLACK time expired\n";
+            show_single_clock(aux_out, pclk[WHITE]);
+            break;
+        default:
+            break;
+    }
+    aux_out << " (wins)" << std::endl;
+    std::cout << "hit <Return> to continue" << std::flush;
+    active = NONE;
+}
+
 std::future<void> clockwork;
 
 auto start(std::string const&) {
-    if ((player_clock[WHITE].count == 0)
-     || (player_clock[BLACK].count == 0)) {
+    if ((pclk[WHITE].count == 0)
+     || (pclk[BLACK].count == 0)) {
         std::cout << "! not yet (re-)set to start time\n";
     }
     else {

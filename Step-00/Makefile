@@ -1,4 +1,4 @@
-EXE= chess-clock
+EXE= chessclock-app
 
 run: $(EXE)
 	@./$(EXE) $(args)
