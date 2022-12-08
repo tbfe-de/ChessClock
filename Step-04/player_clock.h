@@ -32,8 +32,19 @@ public:
     PlayerClock()                               =delete;
     PlayerClock(PlayerClock const&)             =delete;
     PlayerClock& operator=(PlayerClock const&)  =delete;
-    PlayerClock(PlayerClock &&)                 =delete;
-    PlayerClock& operator=(PlayerClock&&)       =delete;
+    PlayerClock(PlayerClock&& rhs) noexcept     // move c'tor
+        : name_{rhs.name_}, count_{rhs.count_} {
+        rhs.name_ = nullptr;
+    }
+    PlayerClock& operator=(PlayerClock&& rhs) { // move-assign
+        if (this != &rhs) {
+            delete[] name_;
+            name_ = rhs.name_;
+            rhs.name_ = nullptr;
+            count_ = rhs.count_;
+        }
+        return *this;
+    }
 
     // queries:
     value_type get_count() const { return count_; }
