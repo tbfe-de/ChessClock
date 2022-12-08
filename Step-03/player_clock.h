@@ -18,6 +18,7 @@
 struct player_clock {
     auto get_count() const { return count; }
     auto set_count(std::uint_least16_t c) { count = c; }
+    auto decrement() { --count; }
     char const* const name;
     std::uint_least16_t count;
 };
