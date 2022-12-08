@@ -38,6 +38,6 @@ std::ostream& operator<<(std::ostream &strm, const player_clock& clk) {
 }
 
 void set_clocks() {
-    pclk[WHITE].count = pclk[NONE].get_count();
-    pclk[BLACK].count = pclk[NONE].get_count();
+    pclk[WHITE].set_count(pclk[NONE].get_count());
+    pclk[BLACK].set_count(pclk[NONE].get_count());
 }
