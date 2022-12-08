@@ -33,7 +33,7 @@ void ticker_thread() {
         phase = (phase + 1) % N_TICKER_SYMBOLS;
         ticker_indicator = &ticker_symbols[phase];
         if (phase == 0) --pclk[active].count;
-        show_single_clock(aux_out, pclk[active]);
+        operator<<(aux_out, pclk[active]);
         using namespace std::chrono_literals;
         static_assert(1000 % N_TICKER_SYMBOLS == 0,
                       "otherwise clock skew will accumulate");
@@ -43,11 +43,11 @@ void ticker_thread() {
     switch (active) {
         case WHITE:
             aux_out << "\r| WHITE time expired\n";
-            show_single_clock(aux_out, pclk[BLACK]);
+            operator<<(aux_out, pclk[BLACK]);
             break;
         case BLACK:
             aux_out << "\r| BLACK time expired\n";
-            show_single_clock(aux_out, pclk[WHITE]);
+            operator<<(aux_out, pclk[WHITE]);
             break;
         default:
             break;

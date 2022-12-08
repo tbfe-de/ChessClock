@@ -30,11 +30,11 @@ void toggle_player() {
 void show_clocks(unsigned which) {
     aux_out << "+ ------------------------------\n";
     if (which & (1<<NONE))
-        show_single_clock(aux_out, pclk[NONE]) << " preset" << std::endl;
+        operator<<(aux_out, pclk[NONE]) << " preset" << std::endl;
     if (which & (1<<WHITE))
-        show_single_clock(aux_out, pclk[WHITE]) << " initial" << std::endl;
+        operator<<(aux_out, pclk[WHITE]) << " initial" << std::endl;
     if (which & (1<<BLACK))
-        show_single_clock(aux_out, pclk[BLACK]) << " initial" << std::endl;
+        operator<<(aux_out, pclk[BLACK]) << " initial" << std::endl;
 }
 
 bool reset(std::string const& str) {

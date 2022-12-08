@@ -23,7 +23,7 @@ player_clock pclk[] = {
 static_assert((sizeof pclk / sizeof pclk[0]) == 3,
               "maybe incompatible change to `enum player`");
 
-std::ostream& show_single_clock(std::ostream &strm, const player_clock& clk) {
+std::ostream& operator<<(std::ostream &strm, const player_clock& clk) {
     extern char const* ticker_indicator;
     auto const val = clk.count;
     auto const txt = clk.name;

@@ -23,6 +23,6 @@ struct player_clock {
 extern player_clock pclk[];
 extern void set_clocks();
 
-std::ostream& show_single_clock(std::ostream&, const player_clock&);
+std::ostream& operator<<(std::ostream&, const player_clock&);
 
 #endif // include guard
