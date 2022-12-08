@@ -16,10 +16,14 @@
 #include <iosfwd>
 
 struct player_clock {
+    player_clock(char const *const n, std::uint_least16_t c)
+        : name{n}, count{c}
+    {}
     auto get_count() const { return count; }
     auto set_count(std::uint_least16_t c) { count = c; }
     auto decrement() { --count; }
     char const* const name;
+private:
     std::uint_least16_t count;
 };
 
