@@ -14,22 +14,27 @@
 // standard library header files (alphabetically sorted)
 #include <cstdint>
 #include <iosfwd>
+#include <string>
 
-struct player_clock {
-    player_clock(char const *const n, std::uint_least16_t c)
-        : name{n}, count{c}
+class PlayerClock {
+    using name_type = std::string;
+    using value_type = std::uint_least16_t;
+public:
+    PlayerClock(name_type const name, value_type count)
+        : name_{name}, count_{count}
     {}
-    auto get_count() const { return count; }
-    auto set_count(std::uint_least16_t c) { count = c; }
-    auto decrement() { --count; }
-    char const* const name;
+    auto get_count() const { return count_; }
+    auto set_count(value_type count) { count_ = count; }
+    auto decrement() { --count_; }
+    auto get_name() const { return name_; }
 private:
-    std::uint_least16_t count;
+    name_type const name_;
+    std::uint_least16_t count_;
 };
 
-extern player_clock pclk[];
+extern PlayerClock pclk[];
 extern void set_clocks();
 
-std::ostream& operator<<(std::ostream&, const player_clock&);
+std::ostream& operator<<(std::ostream&, const PlayerClock&);
 
 #endif // include guard

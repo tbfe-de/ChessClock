@@ -15,7 +15,7 @@
 #include <iostream>
 #include <iomanip>
 
-player_clock pclk[] = {
+PlayerClock pclk[] = {
     {"START", 15*60},
     {"WHITE", 0},
     {"BLACK", 0}
@@ -23,10 +23,10 @@ player_clock pclk[] = {
 static_assert((sizeof pclk / sizeof pclk[0]) == 3,
               "maybe incompatible change to `enum player`");
 
-std::ostream& operator<<(std::ostream &strm, const player_clock& clk) {
+std::ostream& operator<<(std::ostream &strm, const PlayerClock& clk) {
     extern char const* ticker_indicator;
     auto const val = clk.get_count();
-    auto const txt = clk.name;
+    auto const txt = clk.get_name();
     std::ostream os{strm.rdbuf()};
     os.fill('0');
     os << '\r' << *ticker_indicator
