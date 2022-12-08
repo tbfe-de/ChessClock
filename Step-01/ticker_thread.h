@@ -14,7 +14,6 @@
 // standard library header files (alphabetically sorted)
 // ==NONE==
 
-extern char const ticker_symbols[];
 extern char const *ticker_indicator;
 
 extern void ticker_thread();
