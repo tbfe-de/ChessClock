@@ -14,6 +14,6 @@
 // standard library header files (alphabetically sorted)
 #include <string>
 
-extern void parse_mins_secs(std::string const&);
+extern int parse_mins_secs(std::string const&, int);
 
 #endif // include guard

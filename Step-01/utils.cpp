@@ -16,10 +16,10 @@
 #include <iostream>
 #include <sstream>
 
-void parse_mins_secs(std::string const& str) {
+int parse_mins_secs(std::string const& str, int preset) {
     std::istringstream is{str};
-    auto minutes = pclk[NONE].count / 60;
-    auto seconds = pclk[NONE].count % 60;
+    int minutes = preset/60;
+    int seconds = preset%60;
     std::string s;
     int v;
     if (std::getline(is, s, ':')) {
@@ -39,5 +39,5 @@ void parse_mins_secs(std::string const& str) {
             }
         }
     }
-    pclk[NONE].count = 60*minutes + seconds;
+    return 60*minutes + seconds;
 }

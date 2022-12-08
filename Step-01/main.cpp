@@ -25,7 +25,8 @@ int main(int argc, char *argv[]) {
         }
     }
     if (aux_tty) aux_out.put('\n');
-    if (argc > 1) parse_mins_secs(argv[1]);
+    if (argc > 1)
+        pclk[NONE].count = parse_mins_secs(argv[1], pclk[NONE].count);
     std::cout << "* Welcome from the Chess-Clock *" << std::endl;
     do {} while (menu({
         { "R = (re-)set to <mins>:<secs>\n"
