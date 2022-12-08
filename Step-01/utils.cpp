@@ -1,10 +1,20 @@
+/* C++ module implementation
+ ===============================================================================
+ Chess Clock Main Program
+ ===============================================================================
+ ...
+*/
+
+// own header file always goes first
 #include "utils.h"
 
-#include <iostream>
-#include <sstream>
-
+// project specific header files (alphabetically sorted)
 #include "player.h"
 #include "player_clock.h"
+
+// standard library header files (alphabetically sorted)
+#include <iostream>
+#include <sstream>
 
 void parse_mins_secs(std::string const& str) {
     std::istringstream is{str};

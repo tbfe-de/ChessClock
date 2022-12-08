@@ -1,11 +1,20 @@
+/* C++ header file
+ ===============================================================================
+ Chess Clock Application
+ ===============================================================================
+ ...
+*/
+
 #ifndef CHESSCLOCK_APP_H_
 #define CHESSCLOCK_APP_H_
 
+// project specific header files (alphabetically sorted)
 #include "player_clock.h"
 #include "ticker_thread.h"
 
-#include <future>
+// standard library header files (alphabetically sorted)
 #include <fstream>
+#include <future>
 #include <ostream>
 #include <string>
 

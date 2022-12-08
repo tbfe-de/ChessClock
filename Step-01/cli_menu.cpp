@@ -1,7 +1,17 @@
+/* C++ module implementation
+ ===============================================================================
+ Chess Clock Command Line Menu
+ ===============================================================================
+ ...
+*/
+
+// own header file always goes first
 #include "cli_menu.h"
 
+// project specific header files (alphabetically sorted)
 #include "chessclock_app.h"
 
+// standard library header files (alphabetically sorted)
 #include <initializer_list>
 #include <iostream>
 

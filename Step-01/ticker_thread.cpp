@@ -1,9 +1,19 @@
+/* C++ module implementation
+ ===============================================================================
+ Chess Clock Ticker Thread
+ ===============================================================================
+ ...
+*/
+
+// own header file always goes first
 #include "ticker_thread.h"
 
+// project specific header files (alphabetically sorted)
 #include "chessclock_app.h"
 #include "player.h"
 #include "player_clock.h"
 
+// standard library header files (alphabetically sorted)
 #include <chrono>
 #include <iostream>
 #include <thread>

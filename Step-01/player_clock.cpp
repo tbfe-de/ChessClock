@@ -1,5 +1,17 @@
+/* C++ module implementation
+ ===============================================================================
+ Main Program
+ ===============================================================================
+ ...
+*/
+
+// own header file always goes first
 #include "player_clock.h"
 
+// project specific header files (alphabetically sorted)
+// ==NONE==
+
+// standard library header files (alphabetically sorted)
 #include <iostream>
 #include <iomanip>
 

@@ -1,7 +1,20 @@
+/* C++ module implementation
+ ===============================================================================
+ Main Program
+ ===============================================================================
+ ...
+*/
+
+// own header file always goes first
+// ==NONE==
+
+// project specific header files (alphabetically sorted)
 #include "chessclock_app.h"
 #include "cli_menu.h"
 #include "utils.h"
 
+// standard library header files (alphabetically sorted)
+#include <cstdlib>
 #include <iostream>
 
 int main(int argc, char *argv[]) {

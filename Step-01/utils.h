@@ -1,10 +1,17 @@
+/* C++ header file
+ ===============================================================================
+ Chess Clock Utilities
+ ===============================================================================
+ ...
+*/
+
 #ifndef UTILS_H_
 #define UTILS_H_
 
-#include <string>
+// project specific header files (alphabetically sorted)
+// ==NONE==
 
-#include "player_clock.h"
-
+// standard library header files (alphabetically sorted)
 #include <string>
 
 extern void parse_mins_secs(std::string const&);

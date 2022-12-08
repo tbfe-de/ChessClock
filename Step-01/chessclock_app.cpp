@@ -1,7 +1,19 @@
+/* C++ module implementation
+ ===============================================================================
+ Chess Clock Application
+ ===============================================================================
+ ...
+*/
+
+// own header file always goes first
 #include "chessclock_app.h"
 
+// project specific header files (alphabetically sorted)
 #include "player.h"
 #include "utils.h"
+
+// standard library header files (alphabetically sorted)
+#include <iostream>
 
 std::ofstream aux_tty{}; // <------ should go before ...
 std::ostream aux_out{std::cout.rdbuf()}; // ... this one
