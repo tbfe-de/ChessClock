@@ -9,13 +9,12 @@
 #define CHESSCLOCK_APP_H_
 
 // project specific header files (alphabetically sorted)
-#include "player_clock.h"
-#include "ticker_thread.h"
+// ==NONE==
 
 // standard library header files (alphabetically sorted)
 #include <fstream>
 #include <future>
-#include <ostream>
+#include <iosfwd>
 #include <string>
 
 extern std::ofstream aux_tty;

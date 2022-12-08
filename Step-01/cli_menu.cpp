@@ -10,9 +10,10 @@
 
 // project specific header files (alphabetically sorted)
 #include "chessclock_app.h"
+#include "player.h"
+#include "ticker_thread.h"
 
 // standard library header files (alphabetically sorted)
-#include <initializer_list>
 #include <iostream>
 
 bool menu(std::initializer_list<menu_control> ctl) {

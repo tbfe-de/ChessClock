@@ -13,7 +13,7 @@
 
 // standard library header files (alphabetically sorted)
 #include <cstdint>
-#include <ostream>
+#include <iosfwd>
 
 struct player_clock {
     char const* const name;

@@ -13,6 +13,7 @@
 
 // standard library header files (alphabetically sorted)
 #include <functional>
+#include <initializer_list>
 #include <string>
 
 using menu_prompt = std::string;

@@ -10,6 +10,8 @@
 
 // project specific header files (alphabetically sorted)
 #include "player.h"
+#include "player_clock.h"
+#include "ticker_thread.h"
 #include "utils.h"
 
 // standard library header files (alphabetically sorted)

@@ -28,22 +28,29 @@ CHESSCLOCK_APP_H=\
 	chessclock_app.h
 CLI_MENU_H=\
 	cli_menu.h
-PLAYER_CLOCK_H=\
-	player_clock.h
 PLAYER_H=\
 	player.h
+PLAYER_CLOCK_H=\
+	$(PLAYER_H)\
+	player_clock.h
 TICKER_THREAD_H=\
 	ticker_thread.h
+UTILS_H=\
+	utils.h
 
 CHESSCLOCK_APP_INCL=\
 	$(PLAYER_H)\
+	$(PLAYER_CLOCK_H)\
+	$(TICKER_THREAD_H)\
 	$(UTILS_H)\
-	$(CHESSCLOCK_H)
+	$(CHESSCLOCK_APP_H)
 chessclock_app.o: $(CHESSCLOCK_APP_INCL) chessclock_app.cpp
 	$(COMPILE) chessclock_app.cpp
 
 CLI_MENU_INCL=\
-	$(CHESSCLOCK_H)\
+	$(CHESSCLOCK_APP_H)\
+	$(PLAYER_H)\
+	$(TICKER_THREAD)\
 	$(CLI_MENU)
 cli_menu.o: $(CLI_MENU_INCL) cli_menu.cpp
 	$(COMPILE) cli_menu.cpp
@@ -67,8 +74,6 @@ ticker_thread.o: $(TICKER_THREAD_INCL) ticker_thread.cpp
 	$(COMPILE) ticker_thread.cpp
 
 UTILS_INCL=\
-	$(PLAYER_H)\
-	$(PLAYER_CLOCK_H)\
 	$(UTILS_H)
 utils.o: $(UTILS_INCL) utils.cpp
 	$(COMPILE) -c utils.cpp

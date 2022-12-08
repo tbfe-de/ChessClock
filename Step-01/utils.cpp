@@ -9,8 +9,7 @@
 #include "utils.h"
 
 // project specific header files (alphabetically sorted)
-#include "player.h"
-#include "player_clock.h"
+// ==NONE==
 
 // standard library header files (alphabetically sorted)
 #include <iostream>
