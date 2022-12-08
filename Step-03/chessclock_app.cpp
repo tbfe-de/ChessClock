@@ -40,7 +40,7 @@ void show_clocks(unsigned which) {
 }
 
 bool reset(std::string const& str) {
-    pclk[NONE].count = parse_mins_secs(str, pclk[NONE].get_count());
+    pclk[NONE].set_count(parse_mins_secs(str, pclk[NONE].get_count()));
     set_clocks();
     auto selected = (1<<WHITE) | (1<<BLACK);
     if (!str.empty()) selected |= (1<<NONE);
