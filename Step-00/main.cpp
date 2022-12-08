@@ -22,8 +22,7 @@ enum player : std::size_t {
 };
 std::atomic<player> active = NONE;
 
-using counter_t = std::uint_least32_t;
-struct player_clock_t {
+struct player_clock {
     char const* const name;
     std::uint_least16_t count;
 } pclk[] = {
@@ -35,7 +34,7 @@ static_assert((sizeof pclk / sizeof pclk[0]) == 3,
               "maybe incompatible change to `enum player` above)");
 
 decltype(auto) show_single_clock(std::ostream &strm,
-                                 player_clock_t const& clk) {
+                                 player_clock const& clk) {
     extern char const* ticker_indicator;
     auto const val = clk.count;
     auto const txt = clk.name;
