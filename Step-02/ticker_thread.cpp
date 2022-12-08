@@ -30,12 +30,12 @@ void ticker_thread() {
     using std::size_t;
     auto step = std::chrono::steady_clock::now();
     int phase = 0;
-    while ((pclk[(size_t)player::WHITE].count > 0)
-        && (pclk[(size_t)player::BLACK].count > 0)) {
+    while ((pclk[(size_t)Player::WHITE].count > 0)
+        && (pclk[(size_t)Player::BLACK].count > 0)) {
         phase = (phase + 1) % N_TICKER_SYMBOLS;
         ticker_indicator = &ticker_symbols[phase];
-        if (phase == 0) --pclk[(size_t)(player)active].count;
-        aux_out << pclk[(size_t)(player)active];
+        if (phase == 0) --pclk[(size_t)(Player)active].count;
+        aux_out << pclk[(size_t)(Player)active];
         using namespace std::chrono_literals;
         static_assert(1000 % N_TICKER_SYMBOLS == 0,
                       "otherwise clock skew will accumulate");
@@ -43,18 +43,18 @@ void ticker_thread() {
         std::this_thread::sleep_until(step);
     }
     switch (active) {
-        case player::WHITE:
+        case Player::WHITE:
             aux_out << "\r| WHITE time expired\n"
-                    << pclk[(size_t)player::BLACK];
+                    << pclk[(size_t)Player::BLACK];
             break;
-        case player::BLACK:
+        case Player::BLACK:
             aux_out << "\r| BLACK time expired\n"
-                    << pclk[(size_t)player::WHITE];
+                    << pclk[(size_t)Player::WHITE];
             break;
         default:
             break;
     }
     aux_out << " (wins)" << std::endl;
     std::cout << "hit <Return> to continue" << std::flush;
-    active = player::NONE;
+    active = Player::NONE;
 }

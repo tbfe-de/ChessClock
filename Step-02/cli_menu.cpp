@@ -21,7 +21,7 @@ bool menu(std::initializer_list<menu_control> ctl) {
     auto show_prompts = [&](){
         for (auto const e : ctl)
             cout << e.prompt << '\n';
-        show_clocks(1<<(size_t)player::NONE);
+        show_clocks(1<<(size_t)Player::NONE);
     };
     string cmd;
     auto find_action = [&](char ch) -> menu_action {
@@ -35,10 +35,10 @@ bool menu(std::initializer_list<menu_control> ctl) {
     show_prompts();
     while (cout << ": ", getline(cin, cmd)) {
         if (cmd.empty()) {
-            if (active != player::NONE)
+            if (active != Player::NONE)
                 toggle_player();
         }
-        else if (active == player::NONE) {
+        else if (active == Player::NONE) {
             if (clockwork.valid()) {
                 clockwork.get();
             }

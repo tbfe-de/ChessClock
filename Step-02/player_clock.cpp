@@ -9,7 +9,7 @@
 #include "player_clock.h"
 
 // project specific header files (alphabetically sorted)
-// ==player::player::NONE==
+// ==NONE==
 
 // standard library header files (alphabetically sorted)
 #include <cstddef> // std::size_t
@@ -40,6 +40,6 @@ std::ostream& operator<<(std::ostream &strm, const player_clock& clk) {
 
 void set_clocks() {
     using std::size_t;
-    pclk[(size_t)player::WHITE].count = pclk[(size_t)player::NONE].count;
-    pclk[(size_t)player::BLACK].count = pclk[(size_t)player::NONE].count;
+    pclk[(size_t)Player::WHITE].count = pclk[(size_t)Player::NONE].count;
+    pclk[(size_t)Player::BLACK].count = pclk[(size_t)Player::NONE].count;
 }

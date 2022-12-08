@@ -14,4 +14,4 @@
 // standard library header files (alphabetically sorted)
 // ==NONE==
 
-std::atomic<player> active = player::NONE;
+std::atomic<Player> active = Player::NONE;
