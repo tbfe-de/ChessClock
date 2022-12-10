@@ -58,7 +58,15 @@ private:
     value_type count_;
 };
 
-extern PlayerClock<std::uint_least16_t> pclk[];
+// to make the `PlayerClock` completely independent from the
+// counter type used the template instantiation should be moved
+// to the chess clock application (actual change postponed)
+//
+extern PlayerClock<std::uint_least16_t> pclk[3];
+
+// when the chess clock array is wrapped into a class this should
+// become a member function
+//
 extern void set_clocks();
 
 template<typename T>
