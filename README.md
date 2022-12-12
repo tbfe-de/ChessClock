@@ -70,9 +70,7 @@ language features.
 
 ---
 
-8. Wrap the builtin arithmetic type used for the data member
-   `count_` in a small class of its own, with a type conversion
-   to the basic type's reference type and an `operator<<`:
+8. Wrap the `player_clock` array into a class of its own.
 
    * start with the source code in folder `Step-07`
    * result (for comparison) is in folder `Step-08`

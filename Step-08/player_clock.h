@@ -27,7 +27,6 @@ public:
     PlayerClock(std::string const& name, value_type count)
         : name_{name}, count_{count}
     {}
-    PlayerClock()                               =delete;
     PlayerClock(PlayerClock const&)             =default;
 //  PlayerClock& operator=(PlayerClock const&) // implemented below
     PlayerClock(PlayerClock&&)                  =default;
@@ -55,21 +54,32 @@ public:
     }
 
 private:
-    std::string const name_;
-    value_type count_;
+    std::string name_{};
+    value_type count_{};
+    PlayerClock() = default;
+    friend class PlayerClock_Array;
 };
 
-// to make the `PlayerClock` completely independent from the
-// counter type used the template instantiation should be moved
-// to the chess clock application (actual change postponed)
-//
-extern PlayerClock pclk[3];
+class PlayerClock_Array {
+public:
+    PlayerClock_Array();
+    void set();
+    PlayerClock& operator[](Player idx) {
+        return clk_array[idx];
+    }
+    PlayerClock const& operator[](Player idx) const {
+        return clk_array[idx];
+    }
 
-// when the chess clock array is wrapped into a class this should
-// become a member function
-//
-extern void set_clocks();
+private:
+    PlayerClock clk_array[3];
+    static_assert((sizeof clk_array / sizeof clk_array[0]) == 3,
+                    "maybe incompatible change to `enum player`");
+
+};
 
 extern std::ostream& operator<<(std::ostream &, PlayerClock const&);
+
+extern PlayerClock_Array pclk;
 
 #endif // include guard
