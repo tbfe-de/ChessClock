@@ -28,8 +28,8 @@ char const *ticker_indicator = &ticker_symbols[0];
 void ticker_thread() {
     auto step = std::chrono::steady_clock::now();
     int phase = 0;
-    while ((pclk[WHITE].get_count() > 0)
-        && (pclk[BLACK].get_count() > 0)) {
+    while ((!pclk[WHITE].expired())
+        && (!pclk[BLACK].expired())) {
         phase = (phase + 1) % N_TICKER_SYMBOLS;
         ticker_indicator = &ticker_symbols[phase];
         if (phase == 0) pclk[active].decrement();

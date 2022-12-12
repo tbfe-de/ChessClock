@@ -49,8 +49,8 @@ bool reset(std::string const& str) {
 }
 
 bool start(std::string const&) {
-    if ((pclk[WHITE] == 0)
-     || (pclk[BLACK] == 0)) {
+    if (pclk[WHITE].expired()
+     || pclk[BLACK].expired()) {
         std::cout << "! not yet (re-)set to start time\n";
     }
     else {

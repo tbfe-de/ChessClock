@@ -20,9 +20,8 @@
 #include <iosfwd>
 #include <string>
 
-template<typename T>
 class PlayerClock {
-    using value_type = T;
+    using value_type = std::uint_least16_t;;
 public:
     // construction and destruction:
     PlayerClock(std::string const& name, value_type count)
@@ -37,7 +36,9 @@ public:
 
     // queries:
     auto get_name() const { return name_; }
+    auto expired() const { return (count_ == 0); }
     operator value_type() const { return count_; }
+    explicit operator bool() const { return (count_ > 0); }
 
     // modifiers:
     PlayerClock& operator=(PlayerClock const& rhs) {
@@ -62,24 +63,13 @@ private:
 // counter type used the template instantiation should be moved
 // to the chess clock application (actual change postponed)
 //
-extern PlayerClock<std::uint_least16_t> pclk[3];
+extern PlayerClock pclk[3];
 
 // when the chess clock array is wrapped into a class this should
 // become a member function
 //
 extern void set_clocks();
 
-template<typename T>
-std::ostream& operator<<(std::ostream &strm, const PlayerClock<T>& clk) {
-    extern char const* ticker_indicator;
-    std::ostream os{strm.rdbuf()};
-    os.fill('0');
-    os << '\r' << *ticker_indicator
-        << ' ' << clk.get_name()
-        << ' ' << std::setw(2) << clk/60
-        << ':' << std::setw(2) << clk%60;
-    os.flush();
-    return strm;
-}
-
 #endif // include guard
+
+extern std::ostream& operator<<(std::ostream &, PlayerClock const&);

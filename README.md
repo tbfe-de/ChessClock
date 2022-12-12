@@ -63,8 +63,7 @@ language features.
 ---
 
 7. Remove the classic query and modifier member functions, leaving
-   only the operator versions, and make `value_type` configurable
-   via a template argument:
+   mostly the operator versions:
 
    * start with the source code in folder `Step-06`
    * result (for comparison) is in folder `Step-07`

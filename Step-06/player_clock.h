@@ -35,8 +35,10 @@ public:
     // queries:
     auto get_count() const { return count_; }
     auto get_name() const { return name_; }
+    auto expired() const { return (count_ == 0); }
     // aliases:
     operator value_type() const { return get_count(); }
+    explicit operator bool() const { return !expired(); }
 
     // modifiers:
     void set_count(value_type count) { count_ = count; }
