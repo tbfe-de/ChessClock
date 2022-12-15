@@ -14,7 +14,7 @@ The main goal of this steps to
 1. Set the player clocks to their default start time with the
    `r`-command.
 
-   Opionally that command may be followed by a different start
+   Optionally that command may be followed by a different start
    time specified as minutes and seconds, separated by a colon.
    This time then becomes the default start time (until changed
    again with another `r` -command).
@@ -61,7 +61,7 @@ and restructured.
 
 Here are some questions covered in the discussion following:
 
-1. Which if the following "Modern C++" features can you spot:
+1. Which of the following "Modern C++" features can you spot:
 
    * Uniform initialization (aka. "brace initialization")?
    * Initializer lists?
@@ -71,7 +71,7 @@ Here are some questions covered in the discussion following:
 
    Depending on how much of C++ you already know the code may
    contain C++ features you have not yet seen. These will be
-   explained  in the discussion following the review.
+   explained in the discussion following the review.
 
    **During the discussion your are welcome to ask any questions
    you may have about that code.**
@@ -88,7 +88,7 @@ Here are some questions covered in the discussion following:
    names of `struct`-s, functions, and global data:
 
     * Assume you have to split the program into separate header
-      (`*.h) and implementation (`*.cpp`) files.
+      (`*.h`) and implementation (`*.cpp`) files.
     * How would you place the parts into individual compilation
       units?
       * a main program

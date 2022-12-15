@@ -21,6 +21,7 @@ enum class Player : std::size_t {
     BLACK = 2   // !!! `player_clock` (see `player_clock.h`)
 };
 
+inline
 unsigned int operator<<(unsigned int lhs, Player rhs) {
     return lhs << std::size_t(rhs);
 }
