@@ -31,11 +31,13 @@ int main(int argc, char *argv[]) {
         pclk[Player::NONE] = parse_mins_secs(argv[1], pclk[Player::NONE]);
     std::cout << "* Welcome from the Chess-Clock *" << std::endl;
     do {} while (menu({
-        { "R = (re-)set to <mins>:<secs>\n"
-          "    or last start value used", reset },
-        { "S = start a game (first white)", start },
-        { "_ = toggle player", toggle_player },
-        { "Q = end program", quit },
-    }));
+            { "R = (re-)set to <mins>:<secs>\n"
+              "    or last start value used", reset },
+            { "S = start a game (first white)", start },
+            { "_ = toggle player", toggle_player },
+            { "Q = end program", quit },
+        },
+        []{ show_clocks(1<<Player::NONE); }
+    ));
     std::cout << "* The Chess-Clock says Goodbye *" << std::endl;
 }

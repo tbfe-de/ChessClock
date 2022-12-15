@@ -9,15 +9,14 @@
 #include "cli_menu.h"
 
 // project specific header files (alphabetically sorted)
-#include "chessclock_app.h"
-#include "player.h"
-#include "ticker_thread.h"
+// ==NONE==
 
 // standard library header files (alphabetically sorted)
 #include <iostream>
 #include <regex>
 
-bool menu(std::initializer_list<menu_control> ctl) {
+bool menu(std::initializer_list<menu_control> ctl,
+          menu_state show_state) {
     using namespace std;
     auto remap_keysym = [](std::string const &cl) {
         if (cl.empty()) return cl;
@@ -33,21 +32,7 @@ bool menu(std::initializer_list<menu_control> ctl) {
         for (auto const &e : ctl) {
             cout << remap_keysym(e.prompt) << '\n';
         }
-        show_clocks(1<<Player::NONE);
-    };
-    auto normalize_input = [](std::string s) {
-        {   // trim left white space
-            std::regex re{"^[\t ]*"};
-            s = regex_replace(s, re, "");
-        }
-        {   // trim right white space
-            std::regex re{"[\t ]*$"};
-            s = regex_replace(s, re, "");
-        }
-        {   // replace empty with underscore
-            if (s.empty()) s = "_";
-        }
-        return s;
+        show_state();
     };
     auto find_action = [&](char ch) -> menu_action {
         for (auto const e : ctl) {
@@ -60,7 +45,7 @@ bool menu(std::initializer_list<menu_control> ctl) {
 
     std::string cmd;
     while (cout << ": ", getline(cin, cmd)) {
-        cmd = normalize_input(cmd);
+        if (cmd.empty()) cmd = "_";
         auto const cmd_char = std::toupper(cmd.at(0));
         if (auto action = find_action(cmd_char)) {
             if (not action(cmd.substr(1))) break;

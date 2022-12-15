@@ -18,13 +18,14 @@
 
 using menu_prompt = std::string;
 using menu_action = std::function<bool(std::string const&)>;
+using menu_state = std::function<void()>;
 
 struct menu_control {
     menu_prompt prompt;
     menu_action action;
 };
 
-extern bool menu(std::initializer_list<menu_control>);
+extern bool menu(std::initializer_list<menu_control>, menu_state);
 extern bool quit(std::string const&);
 
 #endif // include guard

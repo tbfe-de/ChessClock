@@ -48,9 +48,6 @@ chessclock_app.o: $(CHESSCLOCK_APP_INCL) chessclock_app.cpp
 	$(COMPILE) chessclock_app.cpp
 
 CLI_MENU_INCL=\
-	$(CHESSCLOCK_APP_H)\
-	$(PLAYER_H)\
-	$(TICKER_THREAD)\
 	$(CLI_MENU)
 cli_menu.o: $(CLI_MENU_INCL) cli_menu.cpp
 	$(COMPILE) cli_menu.cpp
