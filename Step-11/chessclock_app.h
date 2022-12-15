@@ -1,0 +1,29 @@
+/* C++ header file
+ ===============================================================================
+ Chess Clock Application
+ ===============================================================================
+ ...
+*/
+
+#ifndef CHESSCLOCK_APP_H_
+#define CHESSCLOCK_APP_H_
+
+// project specific header files (alphabetically sorted)
+// ==NONE==
+
+// standard library header files (alphabetically sorted)
+#include <fstream>
+#include <future>
+#include <iosfwd>
+#include <string>
+
+extern std::ofstream aux_tty;
+extern std::ostream aux_out;
+extern std::future<void> clockwork;
+
+extern bool toggle_player(std::string const&);
+extern void show_clocks(unsigned);
+extern bool reset(std::string const&);
+extern bool start(std::string const&);
+
+#endif // include guard
