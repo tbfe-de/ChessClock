@@ -21,7 +21,7 @@ extern std::ofstream aux_tty;
 extern std::ostream aux_out;
 extern std::future<void> clockwork;
 
-extern void toggle_player();
+extern bool toggle_player(std::string const&);
 extern void show_clocks(unsigned);
 extern bool reset(std::string const&);
 extern bool start(std::string const&);

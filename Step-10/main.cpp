@@ -34,6 +34,7 @@ int main(int argc, char *argv[]) {
         { "R = (re-)set to <mins>:<secs>\n"
           "    or last start value used", reset },
         { "S = start a game (first white)", start },
+        { "_ = toggle player", toggle_player },
         { "Q = end program", quit },
     }));
     std::cout << "* The Chess-Clock says Goodbye *" << std::endl;

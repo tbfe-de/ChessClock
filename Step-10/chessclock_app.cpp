@@ -21,13 +21,14 @@ std::ofstream aux_tty{}; // <------ should go before ...
 std::ostream aux_out{std::cout.rdbuf()}; // ... this one
 std::future<void> clockwork;
 
-void toggle_player() {
-    if (active == Player::NONE) return;
+bool toggle_player(std::string const &) {
+    if (active == Player::NONE) return true;
     if (aux_tty) aux_out.put('\n');
     switch (active) {
         case Player::WHITE: active = Player::BLACK; break;
         case Player::BLACK: active = Player::WHITE; break;
     }
+    return true;
 }
 
 void show_clocks(unsigned which) {
@@ -41,6 +42,7 @@ void show_clocks(unsigned which) {
 }
 
 bool reset(std::string const& str) {
+    if (active != Player::NONE) return true;
     if (clockwork.valid()) clockwork.get();
     pclk[Player::NONE] = parse_mins_secs(str, pclk[Player::NONE]);
     pclk.set();
@@ -51,6 +53,7 @@ bool reset(std::string const& str) {
 }
 
 bool start(std::string const&) {
+    if (active != Player::NONE) return true;
     if (clockwork.valid()) clockwork.get();
     if (pclk[Player::WHITE].expired()
      or pclk[Player::BLACK].expired()) {
